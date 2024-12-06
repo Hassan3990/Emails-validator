@@ -213,10 +213,10 @@
 
 
 async function processEmails() {
-    // Get backend URL (local or production) from environment variable
+    // Ensure that the correct environment variable is being accessed
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
-    // Log the backend URL being used
+    // Log the backend URL for debugging
     console.log('Backend URL:', backendUrl);
 
     // Get email input from the user
@@ -270,7 +270,6 @@ async function processEmails() {
 }
 
 function displayResults(data) {
-    // Handle case when there's no data returned
     if (!data) {
         document.getElementById('output').innerHTML = 'No data received from the server.';
         return;
@@ -285,7 +284,6 @@ function displayResults(data) {
         <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
     `;
 
-    // Only show "Duplicate Emails" if any are found
     if (data.duplicates && data.duplicates.length > 0) {
         outputHTML += `
             <h3>Duplicate Emails:</h3>
@@ -293,10 +291,8 @@ function displayResults(data) {
         `;
     }
 
-    // Output the results to the page
     document.getElementById('output').innerHTML = outputHTML;
 }
-
 
 
     </script>
