@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Validator</title>
-    <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Validator</title>
+     <style>
         /* Basic Styling */
         * {
             margin: 0;
@@ -55,7 +55,7 @@
         button {
             width: 100%;
             padding: 15px;
-            background-color: #4CAF50;
+            background-color:blue;
             color: white;
             border: none;
             border-radius: 5px;
@@ -80,72 +80,124 @@
     </style>
 </head>
 <body>
-    <h2>Email Validator</h2>
-    <textarea id="emailInput" placeholder="Enter maximum 4000 emails at once"></textarea><br>
-    <button id="validateButton">Check Emails</button>
+  <h1>Email Validator</h1>
+  <textarea id="emailInput" rows="10" cols="50" placeholder="Enter emails separated by a new line"></textarea>
+  <br />
+  <button onclick="processEmails()">Check Emails</button>
+  <div id="results"></div>
 
-    <div class="output" id="output"></div>
+  <script>
+    async function processEmails() {
+      const backendUrl = 'https://<your-vercel-deployment-url>'; // Replace this with your actual backend URL
+      const emailInput = document.getElementById('emailInput').value;
 
-    <script>
-        // Define the function properly and ensure it works
-        const backendUrl = 'https://emails-validator.vercel.app/api/process-emails'; // Replace with your backend URL
-
-     async function processEmails() {
-    const backendUrl = 'https://<your-vercel-deployment-url>';
-    const emailInput = document.getElementById('emailInput').value;
-    const emails = emailInput
+      const emails = emailInput
         .split('\n')
         .map(email => email.trim())
         .filter(email => email);
 
-    if (emails.length === 0) {
+      if (emails.length === 0) {
         alert("Please enter at least one email!");
         return;
-    }
+      }
 
-    try {
+      try {
         const response = await fetch(${backendUrl}/api/process-emails, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emails })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ emails }),
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Server Error:', errorData);
-            alert(Error: ${errorData.error || 'Failed to process emails'});
-            return;
+          const errorData = await response.json();
+          console.error('Server Error:', errorData);
+          alert(Error: ${errorData.error || 'Failed to process emails'});
+          return;
         }
 
         const data = await response.json();
         displayResults(data);
-    } catch (error) {
+      } catch (error) {
         console.error('Network Error:', error);
         alert('Something went wrong. Please check the console for details.');
+      }
     }
-}
-        function displayResults(data) {
-            let outputHTML = `
-                <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
-                <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
-                <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
 
-                <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
-                <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
-            `;
+    function displayResults(results) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<h2>Results</h2>';
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.textContent = Email: ${result.email}, Valid: ${result.isValid};
+        resultsDiv.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Validator</title>
+</head>
+<body>
+  <h1>Email Validator</h1>
+  <textarea id="emailInput" rows="10" cols="50" placeholder="Enter emails separated by a new line"></textarea>
+  <br />
+  <button onclick="processEmails()">Check Emails</button>
+  <div id="results"></div>
 
-            if (data.duplicates.length > 0) {
-                outputHTML += `
-                    <h3>Duplicate Emails:</h3>
-                    <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
-                `;
-            }
+  <script>
+    async function processEmails() {
+      const backendUrl = 'https://<your-vercel-deployment-url>'; // Replace this with your actual backend URL
+      const emailInput = document.getElementById('emailInput').value;
 
-            document.getElementById('output').innerHTML = outputHTML;
+      const emails = emailInput
+        .split('\n')
+        .map(email => email.trim())
+        .filter(email => email);
+
+      if (emails.length === 0) {
+        alert("Please enter at least one email!");
+        return;
+      }
+
+      try {
+        const response = await fetch(${backendUrl}/api/process-emails, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ emails }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Server Error:', errorData);
+          alert(Error: ${errorData.error || 'Failed to process emails'});
+          return;
         }
 
-        // Attach event listener
-        document.getElementById('validateButton').addEventListener('click', processEmails);
-    </script>
+        const data = await response.json();
+        displayResults(data);
+      } catch (error) {
+        console.error('Network Error:', error);
+        alert('Something went wrong. Please check the console for details.');
+      }
+    }
+
+    function displayResults(results) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<h2>Results</h2>';
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.textContent = Email: ${result.email}, Valid: ${result.isValid};
+        resultsDiv.appendChild(div);
+      });
+    }
+  </script>
 </body>
 </html>
