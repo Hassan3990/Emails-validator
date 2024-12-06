@@ -89,7 +89,7 @@
 
   <script>
     async function processEmails() {
-      const backendUrl = 'https://<your-vercel-deployment-url>'; // Replace with your actual backend URL
+      const backendUrl = 'https://emails-validator.vercel.app/process-emails'; // Replace with your actual backend URL
       const emailInput = document.getElementById('emailInput').value;
 
       const emails = emailInput
@@ -103,7 +103,7 @@
       }
 
       try {
-        const response = await fetch(${backendUrl}/api/process-emails, {
+        const response = await fetch(${backendUrl}/process-emails, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
