@@ -212,40 +212,55 @@
 
 
 async function processEmails() {
+    // Get backend URL (local or production) from environment variable
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+
+    // Get email input from the user
     const emailInput = document.getElementById('emailInput').value;
+    
+    // Split the emails, trim whitespace, and filter out empty values
     const emails = emailInput
         .split('\n') // Split by new lines
         .map(email => email.trim()) // Trim whitespace
         .filter(email => email); // Remove empty entries
 
+    // If no emails are provided, show an alert
     if (emails.length === 0) {
         alert("Please enter at least one email!");
         return;
     }
 
     try {
-       const response = await fetch(`${backendUrl}/api/proceed-emails`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ emails })
-});
+        // Send email list to the backend for processing
+        const response = await fetch(`${backendUrl}/api/process-emails`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emails })
+        });
 
+        // Handle unsuccessful response
         if (!response.ok) {
-            throw new Error('Failed to process emails');
+            throw new Error(`Failed to process emails. Status: ${response.status}`);
         }
 
+        // Parse response data
         const data = await response.json();
         displayResults(data);
     } catch (error) {
+        // Log error and alert user
         console.error('Error:', error);
         alert('Something went wrong. Please check the console for details.');
     }
 }
 
-
-
+// Display the results on the page
 function displayResults(data) {
+    // Handle case when there's no data returned
+    if (!data) {
+        document.getElementById('output').innerHTML = 'No data received from the server.';
+        return;
+    }
+
     let outputHTML = `
         <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
 
@@ -256,17 +271,17 @@ function displayResults(data) {
         <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
     `;
 
-    // Show "Duplicate Emails" only if there are any
-    if (data.duplicates.length > 0) {
+    // Only show "Duplicate Emails" if any are found
+    if (data.duplicates && data.duplicates.length > 0) {
         outputHTML += `
             <h3>Duplicate Emails:</h3>
             <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
         `;
     }
 
+    // Output the results to the page
     document.getElementById('output').innerHTML = outputHTML;
 }
-
 
 
 
