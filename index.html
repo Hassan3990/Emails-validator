@@ -88,39 +88,42 @@
 
     <script>
         // Define the function properly and ensure it works
-        const backendUrl = 'https://your-backend-url.vercel.app/api/process-emails'; // Replace with your backend URL
+        const backendUrl = 'https://emails-validator.vercel.app/'; // Replace with your backend URL
 
-        async function processEmails() {
-            const emailInput = document.getElementById('emailInput').value;
-            const emails = emailInput
-                .split('\n') // Split by new lines
-                .map(email => email.trim()) // Trim whitespace
-                .filter(email => email); // Remove empty entries
+     async function processEmails() {
+    const backendUrl = 'https://<your-vercel-deployment-url>';
+    const emailInput = document.getElementById('emailInput').value;
+    const emails = emailInput
+        .split('\n')
+        .map(email => email.trim())
+        .filter(email => email);
 
-            if (emails.length === 0) {
-                alert("Please enter at least one email!");
-                return;
-            }
+    if (emails.length === 0) {
+        alert("Please enter at least one email!");
+        return;
+    }
 
-            try {
-                const response = await fetch(backendUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emails })
-                });
+    try {
+        const response = await fetch(${backendUrl}/api/process-emails, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emails })
+        });
 
-                if (!response.ok) {
-                    throw new Error('Failed to process emails');
-                }
-
-                const data = await response.json();
-                displayResults(data);
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Something went wrong. Please check the console for details.');
-            }
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Server Error:', errorData);
+            alert(Error: ${errorData.error || 'Failed to process emails'});
+            return;
         }
 
+        const data = await response.json();
+        displayResults(data);
+    } catch (error) {
+        console.error('Network Error:', error);
+        alert('Something went wrong. Please check the console for details.');
+    }
+}
         function displayResults(data) {
             let outputHTML = `
                 <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
