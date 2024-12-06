@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Validator by Hassan Khalid</title>
+    <title>Email Validator</title>
     <style>
+        /* Basic Styling */
         * {
             margin: 0;
             padding: 0;
@@ -54,7 +55,7 @@
         button {
             width: 100%;
             padding: 15px;
-            background-color:blue;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -71,126 +72,66 @@
             margin-top: 20px;
         }
 
-        .output li.invalid {
-            background-color: #cbbbbc;
-        }
-
-        .output li {
+        .output pre {
             background-color: #e0f7fa;
-            margin: 5px 0;
             padding: 10px;
             border-radius: 5px;
-        }
-
-        .output ul {
-            list-style-type:armenian;
-            padding-left: 0;
-        }
-
-        .output {
-            margin-top: 30px;
-            display:block;
-        }
-
-        .output h1 {
-            margin-bottom: 20px;
-            margin-top: 10px;
-            margin-right: 7px;
-        }
-
-        .output h3 {
-            margin: 5px;
-        }
-
-        .valid-emails {
-            color: black;
-        }
-
-        .duplicate-emails {
-            color: blue;
-        }
-
-        .invalid-emails {
-            color: rgb(250, 4, 4);
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-
-            button {
-                font-size: 16px;
-            }
-
-            textarea {
-                font-size: 14px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
         }
     </style>
 </head>
 <body>
     <h2>Email Validator</h2>
-    <textarea id="emailInput" placeholder="Enter maximum 4000 emails at once"></textarea><br>
-    <button onclick="processEmails()">Check Emails</button>
-
-    <div class="output" id="output"></div>
+    <div class="container">
+        <textarea id="emailInput" placeholder="Enter up to 4000 emails, one per line"></textarea>
+        <button onclick="processEmails()">Validate Emails</button>
+        <div class="output" id="output"></div>
+    </div>
 
     <script>
         async function processEmails() {
-            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-            const emailInput = document.getElementById('emailInput').value;
-            const emails = emailInput
-                .split('\n') // Split by new lines
-                .map(email => email.trim()) // Trim whitespace
-                .filter(email => email); // Remove empty entries
+            const backendUrl = 'https://your-backend-url.com'; // Replace with your actual backend deployment URL
+            const emailInput = document.getElementById('emailInput').value.trim();
+            const emails = emailInput.split('\n').map(email => email.trim()).filter(email => email);
 
             if (emails.length === 0) {
-                alert("Please enter at least one email!");
+                alert("Please enter at least one email.");
+                return;
+            }
+
+            if (emails.length > 4000) {
+                alert("Maximum 4000 emails are allowed.");
                 return;
             }
 
             try {
-                const response = await fetch(`${backendUrl}/api/process-emails`, {
+                const response = await fetch(${backendUrl}/api/process-emails, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ emails })
+                    body: JSON.stringify({ emails }),
                 });
 
                 if (!response.ok) {
-                    throw new Error('Failed to process emails');
+                    throw new Error('Failed to process emails. Please try again.');
                 }
 
                 const data = await response.json();
                 displayResults(data);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Something went wrong. Please check the console for details.');
+                alert('Something went wrong. Check the console for details.');
             }
         }
 
         function displayResults(data) {
-            let outputHTML = `
-                <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
-                <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
-                <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
-
-                <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
-                <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
+            const output = `
+                <h3>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h3>
+                <h3>Valid Emails (${data.totalValidEmails}):</h3>
+                <pre>${data.validEmails.join('\n')}</pre>
+                <h3>Invalid Emails (${data.totalInvalidEmails}):</h3>
+                <pre>${data.invalidEmails.join('\n')}</pre>
+                ${data.duplicates.length > 0 ? <h3>Duplicate Emails (${data.duplicates.length}):</h3><pre>${data.duplicates.join('\n')}</pre> : ''}
             `;
-
-            if (data.duplicates.length > 0) {
-                outputHTML += `
-                    <h3>Duplicate Emails:</h3>
-                    <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
-                `;
-            }
-
-            document.getElementById('output').innerHTML = outputHTML;
+            document.getElementById('output').innerHTML = output;
         }
     </script>
 </body>
