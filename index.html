@@ -83,11 +83,13 @@
     <h2>Email Validator</h2>
     <div class="container">
         <textarea id="emailInput" placeholder="Enter up to 4000 emails, one per line"></textarea>
-        <button onclick="processEmails()">Validate Emails</button>
+        <button id="validateButton">Validate Emails</button>
         <div class="output" id="output"></div>
     </div>
 
     <script>
+        document.getElementById('validateButton').addEventListener('click', processEmails);
+
         async function processEmails() {
             const backendUrl = 'https://your-backend-url.com'; // Replace with your backend URL
             const emailInput = document.getElementById('emailInput').value.trim();
