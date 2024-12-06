@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());
 
-app.post('/api/process-emails', (req, res) => {
+app.post('/process-emails', (req, res) => {
   try {
     const { emails } = req.body;
 
@@ -18,7 +18,7 @@ app.post('/api/process-emails', (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Error in /api/process-emails:', error);
+    console.error('Error in /process-emails:', error);
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
