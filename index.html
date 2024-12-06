@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Validator by Hassan Khalid</title>
+    <style>
+
+  /* Resetting some default styles */
+  * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Container to center content */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Textarea Styling */
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #fafafa;
+            resize: vertical;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #19631c;
+        }
+
+        .output {
+            margin-top: 20px;
+        }
+
+
+
+
+        .output li.invalid {
+            background-color: #cbbbbc;
+            
+        }
+
+        .output li {
+            background-color: #e0f7fa;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+
+        .output ul {
+            list-style-type:armenian;
+            padding-left: 0;
+        }
+
+        .output {
+            margin-top: 30px;
+            display:block;
+           
+        }
+
+        .output h1{
+            margin-bottom: 20px;
+            margin-top: 10px;
+            margin-right: 7px;
+        }
+       
+    
+      
+.output h3{
+    margin: 5px;
+}
+       
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+
+            textarea {
+                font-size: 14px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+
+.valid-emails{
+    color: black;
+}
+
+.duplicate-emails{
+    color:blue
+}
+        .invalid-emails{
+            color: rgb(250, 4, 4);
+        }
+    
+     
+    </style>
+</head>
+<body>
+    <h2>Email Validator</h2>
+    <textarea id="emailInput" placeholder="Enter maximaum 4000 emails at once"></textarea><br>
+    <button onclick="processEmails()">Check Emails</button>
+
+
+
+
+    <div class="output" id="output"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+ 
+// async function processEmails() {
+//     const emailInput = document.getElementById('emailInput').value;
+//     const emails = emailInput
+//         .split('\n')  // Split by new lines
+//         .map(email => email.trim()) // Trim whitespace
+//         .filter(email => email); // Remove empty entries
+
+//     if (emails.length === 0) {
+//         alert("Please enter at least one email!");
+//         return;
+//     }
+
+//     try {
+//         const response = await fetch('http://localhost:5000/api/process-emails', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ emails })
+//         });
+
+//         if (!response.ok) {
+//             throw new Error('Failed to process emails');
+//         }
+
+//         const data = await response.json();
+//         displayResults(data);
+//     } catch (error) {
+//         console.error('Error:', error);
+//         alert('Something went wrong. Please check the console for details.');
+//     }
+// }
+
+
+async function processEmails() {
+    const emailInput = document.getElementById('emailInput').value;
+    const emails = emailInput
+        .split('\n') // Split by new lines
+        .map(email => email.trim()) // Trim whitespace
+        .filter(email => email); // Remove empty entries
+
+    if (emails.length === 0) {
+        alert("Please enter at least one email!");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/process-emails', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emails })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to process emails');
+        }
+
+        const data = await response.json();
+        displayResults(data);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Something went wrong. Please check the console for details.');
+    }
+}
+
+
+
+function displayResults(data) {
+    let outputHTML = `
+        <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
+
+        <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
+        <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
+
+        <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
+        <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
+    `;
+
+    // Show "Duplicate Emails" only if there are any
+    if (data.duplicates.length > 0) {
+        outputHTML += `
+            <h3>Duplicate Emails:</h3>
+            <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
+        `;
+    }
+
+    document.getElementById('output').innerHTML = outputHTML;
+}
+
+
+
+
+
+
+    </script>
+</body>
+</html>
