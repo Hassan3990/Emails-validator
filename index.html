@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Validator by Hassan Khalid</title>
     <style>
-
-  /* Resetting some default styles */
-  * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Body styling */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f8;
@@ -27,7 +24,6 @@
             color: #2c3e50;
         }
 
-        /* Container to center content */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -37,7 +33,6 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        /* Textarea Styling */
         textarea {
             width: 100%;
             height: 150px;
@@ -56,7 +51,6 @@
             outline: none;
         }
 
-        /* Button Styling */
         button {
             width: 100%;
             padding: 15px;
@@ -77,12 +71,8 @@
             margin-top: 20px;
         }
 
-
-
-
         .output li.invalid {
             background-color: #cbbbbc;
-            
         }
 
         .output li {
@@ -92,7 +82,6 @@
             border-radius: 5px;
         }
 
-
         .output ul {
             list-style-type:armenian;
             padding-left: 0;
@@ -101,23 +90,30 @@
         .output {
             margin-top: 30px;
             display:block;
-           
         }
 
-        .output h1{
+        .output h1 {
             margin-bottom: 20px;
             margin-top: 10px;
             margin-right: 7px;
         }
-       
-    
-      
-.output h3{
-    margin: 5px;
-}
-       
 
-        /* Responsive Design */
+        .output h3 {
+            margin: 5px;
+        }
+
+        .valid-emails {
+            color: black;
+        }
+
+        .duplicate-emails {
+            color: blue;
+        }
+
+        .invalid-emails {
+            color: rgb(250, 4, 4);
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -135,166 +131,67 @@
                 font-size: 24px;
             }
         }
-
-.valid-emails{
-    color: black;
-}
-
-.duplicate-emails{
-    color:blue
-}
-        .invalid-emails{
-            color: rgb(250, 4, 4);
-        }
-    
-     
     </style>
 </head>
 <body>
     <h2>Email Validator</h2>
-    <textarea id="emailInput" placeholder="Enter maximaum 4000 emails at once"></textarea><br>
+    <textarea id="emailInput" placeholder="Enter maximum 4000 emails at once"></textarea><br>
     <button onclick="processEmails()">Check Emails</button>
-
-
-
 
     <div class="output" id="output"></div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <script>
- 
-// async function processEmails() {
-        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-//     const emailInput = document.getElementById('emailInput').value;
-//     const emails = emailInput
-//         .split('\n')  // Split by new lines
-//         .map(email => email.trim()) // Trim whitespace
-//         .filter(email => email); // Remove empty entries
+        async function processEmails() {
+            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+            const emailInput = document.getElementById('emailInput').value;
+            const emails = emailInput
+                .split('\n') // Split by new lines
+                .map(email => email.trim()) // Trim whitespace
+                .filter(email => email); // Remove empty entries
 
-//     if (emails.length === 0) {
-//         alert("Please enter at least one email!");
-//         return;
-//     }
+            if (emails.length === 0) {
+                alert("Please enter at least one email!");
+                return;
+            }
 
-//     try {
-//         const response = await fetch('http://localhost:5000/api/process-emails', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ emails })
-//         });
+            try {
+                const response = await fetch(`${backendUrl}/api/process-emails`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emails })
+                });
 
-//         if (!response.ok) {
-//             throw new Error('Failed to process emails');
-//         }
+                if (!response.ok) {
+                    throw new Error('Failed to process emails');
+                }
 
-//         const data = await response.json();
-//         displayResults(data);
-//     } catch (error) {
-//         console.error('Error:', error);
-//         alert('Something went wrong. Please check the console for details.');
-//     }
-// }
-
-
-
-async function processEmails() {
-    // Ensure that the correct environment variable is being accessed
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
-
-    // Log the backend URL for debugging
-    console.log('Backend URL:', backendUrl);
-
-    // Get email input from the user
-    const emailInput = document.getElementById('emailInput').value;
-
-    // Split the emails, trim whitespace, and filter out empty values
-    const emails = emailInput
-        .split('\n') // Split by new lines
-        .map(email => email.trim()) // Trim whitespace
-        .filter(email => email); // Remove empty entries
-
-    // If no emails are provided, show an alert
-    if (emails.length === 0) {
-        alert("Please enter at least one email!");
-        return;
-    }
-
-    try {
-        // Log the email array being sent
-        console.log('Emails to be sent:', emails);
-
-        // Send email list to backend for processing
-        const response = await fetch(`${backendUrl}/api/process-emails`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emails })
-        });
-
-        // Log the response status and check for errors
-        console.log('Response status:', response.status);
-
-        // Handle unsuccessful response
-        if (!response.ok) {
-            throw new Error(`Failed to process emails. Status: ${response.status}`);
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please check the console for details.');
+            }
         }
 
-        // Parse response data
-        const data = await response.json();
+        function displayResults(data) {
+            let outputHTML = `
+                <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
+                <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
+                <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
 
-        // Log the data received from the backend
-        console.log('Data received from backend:', data);
+                <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
+                <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
+            `;
 
-        displayResults(data);
-    } catch (error) {
-        // Log error details
-        console.error('Error:', error);
+            if (data.duplicates.length > 0) {
+                outputHTML += `
+                    <h3>Duplicate Emails:</h3>
+                    <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
+                `;
+            }
 
-        // Display a more detailed error message
-        alert('Something went wrong. Please check the console for details.');
-    }
-}
-
-function displayResults(data) {
-    if (!data) {
-        document.getElementById('output').innerHTML = 'No data received from the server.';
-        return;
-    }
-
-    let outputHTML = `
-        <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
-        <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
-        <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
-
-        <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
-        <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
-    `;
-
-    if (data.duplicates && data.duplicates.length > 0) {
-        outputHTML += `
-            <h3>Duplicate Emails:</h3>
-            <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
-        `;
-    }
-
-    document.getElementById('output').innerHTML = outputHTML;
-}
-
-
+            document.getElementById('output').innerHTML = outputHTML;
+        }
     </script>
 </body>
 </html>
