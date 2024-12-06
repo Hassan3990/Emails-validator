@@ -1,6 +1,27 @@
 // api/process-emails.js
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+
+
+app.post('/api/process-emails', (req, res) => {
+    try {
+        const { emails } = req.body;
+
+        if (!emails || !Array.isArray(emails)) {
+            return res.status(400).json({ error: "'emails' must be an array of email strings." });
+        }
+
+        if (emails.length > 4000) {
+            return res.status(400).json({ error: "Maximum 4000 emails are allowed." });
+        }
+
+        const results = validateEmails(emails);
+        res.json(results);
+    } catch (error) {
+        console.error('Error in /api/process-emails:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+    }
+});
 export default function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
