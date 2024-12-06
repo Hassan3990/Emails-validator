@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Email Validator</title>
-     <style>
+  <style>
         /* Basic Styling */
         * {
             margin: 0;
@@ -79,6 +79,7 @@
         }
     </style>
 </head>
+</head>
 <body>
   <h1>Email Validator</h1>
   <textarea id="emailInput" rows="10" cols="50" placeholder="Enter emails separated by a new line"></textarea>
@@ -88,7 +89,7 @@
 
   <script>
     async function processEmails() {
-      const backendUrl = 'https://<your-vercel-deployment-url>'; // Replace this with your actual backend URL
+      const backendUrl = 'https://<your-vercel-deployment-url>'; // Replace with your actual backend URL
       const emailInput = document.getElementById('emailInput').value;
 
       const emails = emailInput
@@ -137,4 +138,3 @@
   </script>
 </body>
 </html>
-
