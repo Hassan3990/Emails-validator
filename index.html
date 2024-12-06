@@ -81,60 +81,68 @@
 </head>
 <body>
     <h2>Email Validator</h2>
-    <div class="container">
-        <textarea id="emailInput" placeholder="Enter up to 4000 emails, one per line"></textarea>
-        <button id="validateButton">Validate Emails</button>
-        <div class="output" id="output"></div>
-    </div>
+    <textarea id="emailInput" placeholder="Enter maximum 4000 emails at once"></textarea><br>
+    <button id="validateButton">Check Emails</button>
+
+    <div class="output" id="output"></div>
 
     <script>
-      document.getElementById('validateButton').addEventListener('click', processEmails);
+        // Define the function properly and ensure it works
+        const backendUrl = 'https://your-backend-url.vercel.app/api/process-emails'; // Replace with your backend URL
 
-async function processEmails() {
-    const backendUrl = '/api/process-emails'; // Vercel serverless function
-    const emailInput = document.getElementById('emailInput').value.trim();
-    const emails = emailInput.split('\n').map(email => email.trim()).filter(email => email);
+        async function processEmails() {
+            const emailInput = document.getElementById('emailInput').value;
+            const emails = emailInput
+                .split('\n') // Split by new lines
+                .map(email => email.trim()) // Trim whitespace
+                .filter(email => email); // Remove empty entries
 
-    if (emails.length === 0) {
-        alert("Please enter at least one email.");
-        return;
-    }
+            if (emails.length === 0) {
+                alert("Please enter at least one email!");
+                return;
+            }
 
-    if (emails.length > 4000) {
-        alert("Maximum 4000 emails are allowed.");
-        return;
-    }
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emails })
+                });
 
-    try {
-        const response = await fetch(backendUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emails }),
-        });
+                if (!response.ok) {
+                    throw new Error('Failed to process emails');
+                }
 
-        if (!response.ok) {
-            throw new Error('Failed to process emails. Please try again.');
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Something went wrong. Please check the console for details.');
+            }
         }
 
-        const data = await response.json();
-        displayResults(data);
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Something went wrong. Check the console for details.');
-    }
-}
+        function displayResults(data) {
+            let outputHTML = `
+                <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
+                <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
+                <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
 
-function displayResults(data) {
-    const output = `
-        <h3>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h3>
-        <h3>Valid Emails (${data.totalValidEmails}):</h3>
-        <pre>${data.validEmails.join('\n')}</pre>
-        <h3>Invalid Emails (${data.totalInvalidEmails}):</h3>
-        <pre>${data.invalidEmails.join('\n')}</pre>
-        ${data.duplicates.length > 0 ? <h3>Duplicate Emails (${data.duplicates.length}):</h3><pre>${data.duplicates.join('\n')}</pre> : ''}
-    `;
-    document.getElementById('output').innerHTML = output;
-}
+                <h3>Total Invalid Emails: ${data.totalInvalidEmails}</h3>
+                <pre class="invalid-emails">${data.invalidEmails.join('\n')}</pre>
+            `;
+
+            if (data.duplicates.length > 0) {
+                outputHTML += `
+                    <h3>Duplicate Emails:</h3>
+                    <pre class="duplicate-emails">${data.duplicates.join('\n')}</pre>
+                `;
+            }
+
+            document.getElementById('output').innerHTML = outputHTML;
+        }
+
+        // Attach event listener
+        document.getElementById('validateButton').addEventListener('click', processEmails);
     </script>
 </body>
 </html>
