@@ -3,26 +3,28 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Middleware
 app.use(bodyParser.json());
+app.use(cors({
+    origin: ['https://your-frontend-url.com'], // Replace with your deployed frontend URL
+    methods: ['POST'],
+    allowedHeaders: ['Content-Type'],
+}));
 
-// Regular expression for email validation
+// Email Validation Logic
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-// Function to validate emails
 function validateEmails(emails) {
     const uniqueEmails = new Set();
     const validEmails = [];
     const invalidEmails = [];
     const duplicates = [];
 
-    emails.forEach((email) => {
+    emails.forEach(email => {
         if (uniqueEmails.has(email)) {
-            if (!duplicates.includes(email)) {
-                duplicates.push(email);
-            }
+            if (!duplicates.includes(email)) duplicates.push(email);
         } else if (EMAIL_REGEX.test(email)) {
             validEmails.push(email);
             uniqueEmails.add(email);
@@ -40,24 +42,23 @@ function validateEmails(emails) {
     };
 }
 
-// API endpoint to process emails
+// API Endpoint
 app.post('/api/process-emails', (req, res) => {
     const { emails } = req.body;
 
     if (!emails || !Array.isArray(emails)) {
-        return res.status(400).json({ error: "'emails' must be an array of email strings." });
+        return res.status(400).json({ error: "'emails' must be an array of strings." });
     }
 
     if (emails.length > 4000) {
-        return res.status(400).json({ error: "Maximum 4000 emails are allowed." });
+        return res.status(400).json({ error: "You can validate up to 4000 emails only." });
     }
 
     const results = validateEmails(emails);
     res.json(results);
 });
 
-// Start the server
+// Start Server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(Server is running on port ${PORT});
 });
-
