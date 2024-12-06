@@ -179,6 +179,7 @@
     <script>
  
 // async function processEmails() {
+        const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 //     const emailInput = document.getElementById('emailInput').value;
 //     const emails = emailInput
 //         .split('\n')  // Split by new lines
@@ -211,6 +212,7 @@
 
 
 async function processEmails() {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
     const emailInput = document.getElementById('emailInput').value;
     const emails = emailInput
         .split('\n') // Split by new lines
@@ -223,11 +225,11 @@ async function processEmails() {
     }
 
     try {
-        const response = await fetch('/api/process-emails', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emails })
-        });
+       const response = await fetch(`${backendUrl}/api/proceed-emails`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ emails })
+});
 
         if (!response.ok) {
             throw new Error('Failed to process emails');
