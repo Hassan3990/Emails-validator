@@ -211,13 +211,17 @@
 // }
 
 
+
 async function processEmails() {
     // Get backend URL (local or production) from environment variable
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
 
+    // Log the backend URL being used
+    console.log('Backend URL:', backendUrl);
+
     // Get email input from the user
     const emailInput = document.getElementById('emailInput').value;
-    
+
     // Split the emails, trim whitespace, and filter out empty values
     const emails = emailInput
         .split('\n') // Split by new lines
@@ -231,12 +235,18 @@ async function processEmails() {
     }
 
     try {
-        // Send email list to the backend for processing
+        // Log the email array being sent
+        console.log('Emails to be sent:', emails);
+
+        // Send email list to backend for processing
         const response = await fetch(`${backendUrl}/api/process-emails`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ emails })
         });
+
+        // Log the response status and check for errors
+        console.log('Response status:', response.status);
 
         // Handle unsuccessful response
         if (!response.ok) {
@@ -245,15 +255,20 @@ async function processEmails() {
 
         // Parse response data
         const data = await response.json();
+
+        // Log the data received from the backend
+        console.log('Data received from backend:', data);
+
         displayResults(data);
     } catch (error) {
-        // Log error and alert user
+        // Log error details
         console.error('Error:', error);
+
+        // Display a more detailed error message
         alert('Something went wrong. Please check the console for details.');
     }
 }
 
-// Display the results on the page
 function displayResults(data) {
     // Handle case when there's no data returned
     if (!data) {
@@ -263,7 +278,6 @@ function displayResults(data) {
 
     let outputHTML = `
         <h1>Total Emails: ${data.totalValidEmails + data.totalInvalidEmails}</h1>
-
         <h3>Total Valid Emails: ${data.totalValidEmails}</h3>
         <pre class="valid-emails">${data.validEmails.join('\n')}</pre>
 
@@ -282,8 +296,6 @@ function displayResults(data) {
     // Output the results to the page
     document.getElementById('output').innerHTML = outputHTML;
 }
-
-
 
 
 
