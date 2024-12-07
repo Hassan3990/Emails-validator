@@ -1,7 +1,11 @@
-const express = require('express');
+
+const cors = require('cors'); // Import cors
 const app = express();
 
+app.use(cors()); // Enable CORS
 app.use(express.json());
+
+
 
 app.post('/process-emails', (req, res) => {
   try {
