@@ -86,9 +86,10 @@
   <button onclick="processEmails()">Check Emails</button>
   <div id="results"></div>
 
+
   <script>
     async function processEmails() {
-      const backendUrl = 'https://emails-validator.vercel.app'; // Replace with your actual backend URL
+      const backendUrl = 'https://emails-validator.vercel.app/api/process-emails'; // Replace with your actual backend URL
       const emailInput = document.getElementById('emailInput').value;
 
       const emails = emailInput
