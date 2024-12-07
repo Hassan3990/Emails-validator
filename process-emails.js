@@ -1,13 +1,9 @@
 
-const cors = require('cors'); // Import cors
-const app = express();
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+  }
 
-app.use(cors()); // Enable CORS
-app.use(express.json());
-
-
-
-app.post('/process-emails', (req, res) => {
   try {
     const { emails } = req.body;
 
@@ -20,19 +16,14 @@ app.post('/process-emails', (req, res) => {
       isValid: validateEmail(email),
     }));
 
-    res.json(results);
+    return res.status(200).json(results);
   } catch (error) {
-    console.error('Error in /process-emails:', error);
-    res.status(500).json({ error: 'Internal server error.' });
+    console.error('Error in process-emails:', error);
+    return res.status(500).json({ error: 'Internal server error.' });
   }
-});
+}
 
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
